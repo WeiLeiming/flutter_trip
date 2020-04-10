@@ -23,7 +23,7 @@ class WebView extends StatefulWidget {
 }
 
 class _WebViewState extends State<WebView> {
-  final webviewReference = FlutterWebviewPlugin();
+  final webViewReference = FlutterWebviewPlugin();
   StreamSubscription<String> _onUrlChanged;
   StreamSubscription<WebViewStateChanged> _onStateChanged;
   StreamSubscription<WebViewHttpError> _onHttpError;
@@ -32,15 +32,15 @@ class _WebViewState extends State<WebView> {
   @override
   void initState() {
     super.initState();
-    webviewReference.close();
-    _onUrlChanged = webviewReference.onUrlChanged.listen((String url) {});
+    webViewReference.close();
+    _onUrlChanged = webViewReference.onUrlChanged.listen((String url) {});
     _onStateChanged =
-        webviewReference.onStateChanged.listen((WebViewStateChanged state) {
+        webViewReference.onStateChanged.listen((WebViewStateChanged state) {
       switch (state.type) {
         case WebViewState.startLoad:
           if (_isToMain(state.url) && !exiting) {
             if (widget.backForbid) {
-              webviewReference.launch(widget.url);
+              webViewReference.launch(widget.url);
             } else {
               Navigator.pop(context);
               exiting = true;
@@ -52,16 +52,16 @@ class _WebViewState extends State<WebView> {
       }
     });
     _onHttpError =
-        webviewReference.onHttpError.listen((WebViewHttpError error) {});
+        webViewReference.onHttpError.listen((WebViewHttpError error) {});
   }
 
   @override
   void dispose() {
-    super.dispose();
     _onUrlChanged.cancel();
     _onStateChanged.cancel();
     _onHttpError.cancel();
-    webviewReference.dispose();
+    webViewReference.dispose();
+    super.dispose();
   }
 
   @override
@@ -105,11 +105,16 @@ class _WebViewState extends State<WebView> {
       );
     }
     return Container(
+      color: backgroundColor,
+      padding: EdgeInsets.fromLTRB(0, 40, 0, 10),
       child: FractionallySizedBox(
         widthFactor: 1,
         child: Stack(
           children: <Widget>[
             GestureDetector(
+              onTap: () {
+                Navigator.pop(context);
+              },
               child: Container(
                 margin: EdgeInsets.only(left: 10),
                 child: Icon(
