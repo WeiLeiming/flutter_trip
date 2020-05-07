@@ -7,6 +7,7 @@ import 'package:trip/model/home_model.dart';
 import 'package:trip/utils/logger.dart';
 import 'package:trip/widget/grid_nav.dart';
 import 'package:trip/widget/local_nav.dart';
+import 'package:trip/widget/sub_nav.dart';
 
 const APPBAR_SCROLL_OFFSET = 100;
 
@@ -24,6 +25,7 @@ class _HomePageState extends State<HomePage> {
   ];
   double appBarAlpha = 0;
   List<CommonModel> localNavList = [];
+  List<CommonModel> subNavList = [];
   GridNavModel gridNavModel;
 
   @override
@@ -76,6 +78,12 @@ class _HomePageState extends State<HomePage> {
                     padding: EdgeInsets.fromLTRB(7, 0, 7, 4),
                     child: GridNav(
                       gridNavModel: gridNavModel,
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(7, 0, 7, 4),
+                    child: SubNav(
+                      subNavList: subNavList,
                     ),
                   ),
                   Container(
@@ -137,6 +145,7 @@ class _HomePageState extends State<HomePage> {
       Logger.debug(model.toJson());
       setState(() {
         localNavList = model.localNavList;
+        subNavList = model.subNavList;
         gridNavModel = model.gridNav;
       });
     } catch (e) {
