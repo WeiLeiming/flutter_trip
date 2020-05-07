@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:trip/model/common_model.dart';
 import 'package:trip/utils/logger.dart';
 import 'package:trip/widget/webview.dart';
-
+/// 活动入口
 class SubNav extends StatelessWidget {
   final List<CommonModel> subNavList;
 
@@ -29,8 +29,6 @@ class SubNav extends StatelessWidget {
       items.add(_item(context, model));
     });
     int separate = (subNavList.length / 2 + 0.5).toInt();
-    Logger.debug(subNavList.length);
-    Logger.debug(separate);
     return Column(
       children: <Widget>[
         Row(
