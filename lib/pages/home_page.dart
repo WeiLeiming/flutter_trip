@@ -7,6 +7,7 @@ import 'package:trip/model/home_model.dart';
 import 'package:trip/model/sales_box_model.dart';
 import 'package:trip/utils/logger.dart';
 import 'package:trip/widget/grid_nav.dart';
+import 'package:trip/widget/loading_container.dart';
 import 'package:trip/widget/local_nav.dart';
 import 'package:trip/widget/sales_box.dart';
 import 'package:trip/widget/sub_nav.dart';
@@ -30,6 +31,7 @@ class _HomePageState extends State<HomePage> {
   List<CommonModel> subNavList = [];
   GridNavModel gridNavModel;
   SalesBoxModel salesBoxModel;
+  bool _loading = true;
 
   @override
   void initState() {
@@ -42,87 +44,90 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color(0xfff2f2f2),
-      body: Stack(
-        children: <Widget>[
-          MediaQuery.removePadding(
-            removeTop: true,
-            context: context,
-            child: NotificationListener(
-              onNotification: (scrollNotification) {
-                if (scrollNotification is ScrollUpdateNotification &&
-                    scrollNotification.depth == 0) {
-                  _onScroll(scrollNotification.metrics.pixels);
-                }
-                return true;
-              },
-              child: ListView(
-                children: <Widget>[
-                  Container(
-                    height: 160,
-                    child: Swiper(
-                      itemCount: _imageUrls.length,
-                      autoplay: true,
-                      itemBuilder: (BuildContext context, int index) {
-                        return Image.network(
-                          _imageUrls[index],
-                          fit: BoxFit.fill,
-                        );
-                      },
-                      pagination: SwiperPagination(),
+      body: LoadingContainer(
+        isLoading: _loading,
+        child: Stack(
+          children: <Widget>[
+            MediaQuery.removePadding(
+              removeTop: true,
+              context: context,
+              child: NotificationListener(
+                onNotification: (scrollNotification) {
+                  if (scrollNotification is ScrollUpdateNotification &&
+                      scrollNotification.depth == 0) {
+                    _onScroll(scrollNotification.metrics.pixels);
+                  }
+                  return true;
+                },
+                child: ListView(
+                  children: <Widget>[
+                    Container(
+                      height: 160,
+                      child: Swiper(
+                        itemCount: _imageUrls.length,
+                        autoplay: true,
+                        itemBuilder: (BuildContext context, int index) {
+                          return Image.network(
+                            _imageUrls[index],
+                            fit: BoxFit.fill,
+                          );
+                        },
+                        pagination: SwiperPagination(),
+                      ),
                     ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(7, 4, 7, 4),
-                    child: LocalNav(
-                      localNavList: localNavList,
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(7, 4, 7, 4),
+                      child: LocalNav(
+                        localNavList: localNavList,
+                      ),
                     ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(7, 0, 7, 4),
-                    child: GridNav(
-                      gridNavModel: gridNavModel,
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(7, 0, 7, 4),
+                      child: GridNav(
+                        gridNavModel: gridNavModel,
+                      ),
                     ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(7, 0, 7, 4),
-                    child: SubNav(
-                      subNavList: subNavList,
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(7, 0, 7, 4),
+                      child: SubNav(
+                        subNavList: subNavList,
+                      ),
                     ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(7, 0, 7, 4),
-                    child: SalesBox(
-                      salesBox: salesBoxModel,
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(7, 0, 7, 4),
+                      child: SalesBox(
+                        salesBox: salesBoxModel,
+                      ),
                     ),
-                  ),
-                  Container(
-                    height: 800,
-                    child: ListTile(
-                      title: Text("resultString"),
+                    Container(
+                      height: 800,
+                      child: ListTile(
+                        title: Text("resultString"),
+                      ),
                     ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          Opacity(
-            opacity: appBarAlpha,
-            child: Container(
-              height: 80,
-              decoration: BoxDecoration(
-                color: Colors.white,
-              ),
-              child: Center(
-                child: Padding(
-                  padding: EdgeInsets.only(
-                    top: 20,
-                  ),
-                  child: Text('首页'),
+                  ],
                 ),
               ),
             ),
-          ),
-        ],
+            Opacity(
+              opacity: appBarAlpha,
+              child: Container(
+                height: 80,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                ),
+                child: Center(
+                  child: Padding(
+                    padding: EdgeInsets.only(
+                      top: 20,
+                    ),
+                    child: Text('首页'),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -157,9 +162,13 @@ class _HomePageState extends State<HomePage> {
         subNavList = model.subNavList;
         gridNavModel = model.gridNav;
         salesBoxModel = model.salesBox;
+        _loading = false;
       });
     } catch (e) {
       print(e);
+      setState(() {
+        _loading = false;
+      });
     }
   }
 }

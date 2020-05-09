@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:trip/model/common_model.dart';
 import 'package:trip/model/sales_box_model.dart';
-import 'package:trip/utils/logger.dart';
 import 'package:trip/widget/webview.dart';
 
 /// 底部卡片入口
