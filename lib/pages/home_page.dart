@@ -11,6 +11,7 @@ import 'package:trip/widget/loading_container.dart';
 import 'package:trip/widget/local_nav.dart';
 import 'package:trip/widget/sales_box.dart';
 import 'package:trip/widget/sub_nav.dart';
+import 'package:trip/widget/webview.dart';
 
 const APPBAR_SCROLL_OFFSET = 100;
 
@@ -20,24 +21,103 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  List _imageUrls = [
-    'http://a3.att.hudong.com/68/61/300000839764127060614318218_950.jpg',
-    'http://h.hiphotos.baidu.com/zhidao/pic/item/0dd7912397dda144dac4acc9b2b7d0a20df486f8.jpg',
-    'http://a4.att.hudong.com/21/09/01200000026352136359091694357.jpg',
-    'http://a2.att.hudong.com/36/48/19300001357258133412489354717.jpg',
-  ];
   double appBarAlpha = 0;
   List<CommonModel> localNavList = [];
+  List<CommonModel> bannerList = [];
   List<CommonModel> subNavList = [];
   GridNavModel gridNavModel;
   SalesBoxModel salesBoxModel;
   bool _loading = true;
 
+  Widget get _banner {
+    return Container(
+      height: 160,
+      child: Swiper(
+        itemCount: bannerList.length,
+        autoplay: true,
+        itemBuilder: (BuildContext context, int index) {
+          return GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) {
+                  CommonModel model = bannerList[index];
+                  return WebView(
+                    url: model.url,
+                    title: model.title,
+                    hideAppBar: model.hideAppBar,
+                  );
+                }),
+              );
+            },
+            child: Image.network(
+              bannerList[index].icon,
+              fit: BoxFit.fill,
+            ),
+          );
+        },
+        pagination: SwiperPagination(),
+      ),
+    );
+  }
+
+  Widget get _listView {
+    return ListView(
+      children: <Widget>[
+        _banner,
+        Padding(
+          padding: EdgeInsets.fromLTRB(7, 4, 7, 4),
+          child: LocalNav(
+            localNavList: localNavList,
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.fromLTRB(7, 0, 7, 4),
+          child: GridNav(
+            gridNavModel: gridNavModel,
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.fromLTRB(7, 0, 7, 4),
+          child: SubNav(
+            subNavList: subNavList,
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.fromLTRB(7, 0, 7, 4),
+          child: SalesBox(
+            salesBox: salesBoxModel,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget get _appBar {
+    return Opacity(
+      opacity: appBarAlpha,
+      child: Container(
+        height: 80,
+        decoration: BoxDecoration(
+          color: Colors.white,
+        ),
+        child: Center(
+          child: Padding(
+            padding: EdgeInsets.only(
+              top: 20,
+            ),
+            child: Text('首页'),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   void initState() {
     super.initState();
 
-    loadData();
+    _handleRefresh();
   }
 
   @override
@@ -51,81 +131,21 @@ class _HomePageState extends State<HomePage> {
             MediaQuery.removePadding(
               removeTop: true,
               context: context,
-              child: NotificationListener(
-                onNotification: (scrollNotification) {
-                  if (scrollNotification is ScrollUpdateNotification &&
-                      scrollNotification.depth == 0) {
-                    _onScroll(scrollNotification.metrics.pixels);
-                  }
-                  return true;
-                },
-                child: ListView(
-                  children: <Widget>[
-                    Container(
-                      height: 160,
-                      child: Swiper(
-                        itemCount: _imageUrls.length,
-                        autoplay: true,
-                        itemBuilder: (BuildContext context, int index) {
-                          return Image.network(
-                            _imageUrls[index],
-                            fit: BoxFit.fill,
-                          );
-                        },
-                        pagination: SwiperPagination(),
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(7, 4, 7, 4),
-                      child: LocalNav(
-                        localNavList: localNavList,
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(7, 0, 7, 4),
-                      child: GridNav(
-                        gridNavModel: gridNavModel,
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(7, 0, 7, 4),
-                      child: SubNav(
-                        subNavList: subNavList,
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(7, 0, 7, 4),
-                      child: SalesBox(
-                        salesBox: salesBoxModel,
-                      ),
-                    ),
-                    Container(
-                      height: 800,
-                      child: ListTile(
-                        title: Text("resultString"),
-                      ),
-                    ),
-                  ],
+              child: RefreshIndicator(
+                onRefresh: _handleRefresh,
+                child: NotificationListener(
+                  onNotification: (scrollNotification) {
+                    if (scrollNotification is ScrollUpdateNotification &&
+                        scrollNotification.depth == 0) {
+                      _onScroll(scrollNotification.metrics.pixels);
+                    }
+                    return false;
+                  },
+                  child: _listView,
                 ),
               ),
             ),
-            Opacity(
-              opacity: appBarAlpha,
-              child: Container(
-                height: 80,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                ),
-                child: Center(
-                  child: Padding(
-                    padding: EdgeInsets.only(
-                      top: 20,
-                    ),
-                    child: Text('首页'),
-                  ),
-                ),
-              ),
-            ),
+            _appBar,
           ],
         ),
       ),
@@ -144,7 +164,7 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  loadData() async {
+  Future<Null> _handleRefresh() async {
 //    HomeDao.fetch().then((result) {
 //      setState(() {
 //        resultString = json.encode(result);
@@ -158,6 +178,7 @@ class _HomePageState extends State<HomePage> {
       HomeModel model = await HomeDao.fetch();
       Logger.debug(model.toJson());
       setState(() {
+        bannerList = model.bannerList;
         localNavList = model.localNavList;
         subNavList = model.subNavList;
         gridNavModel = model.gridNav;
@@ -170,5 +191,6 @@ class _HomePageState extends State<HomePage> {
         _loading = false;
       });
     }
+    return null;
   }
 }
