@@ -10,10 +10,12 @@ import 'package:trip/widget/grid_nav.dart';
 import 'package:trip/widget/loading_container.dart';
 import 'package:trip/widget/local_nav.dart';
 import 'package:trip/widget/sales_box.dart';
+import 'package:trip/widget/search_bar.dart';
 import 'package:trip/widget/sub_nav.dart';
 import 'package:trip/widget/webview.dart';
 
 const APPBAR_SCROLL_OFFSET = 100;
+const SEARCH_BAR_DEFAULT_TEXT = '网红打卡地 景点 酒店 美食';
 
 class HomePage extends StatefulWidget {
   @override
@@ -94,22 +96,38 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget get _appBar {
-    return Opacity(
-      opacity: appBarAlpha,
-      child: Container(
-        height: 80,
-        decoration: BoxDecoration(
-          color: Colors.white,
-        ),
-        child: Center(
-          child: Padding(
-            padding: EdgeInsets.only(
-              top: 20,
+    return Column(
+      children: <Widget>[
+        Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0x66000000), Colors.transparent],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            )
+          ),
+          child: Container(
+            padding: EdgeInsets.fromLTRB(0, 20, 0, 0),
+            height: 80,
+            decoration: BoxDecoration(
+              color: Color.fromARGB((appBarAlpha * 255).toInt(), 255, 255, 255)
             ),
-            child: Text('首页'),
+            child: SearchBar(
+              searchBarType: appBarAlpha > 0.2 ? SearchBarType.homeLight : SearchBarType.home,
+              inputBoxClick: _jumpToSearch,
+              speakClick: _jumpToSpeak,
+              defaultText: SEARCH_BAR_DEFAULT_TEXT,
+              leftButtonClick: () {},
+            ),
           ),
         ),
-      ),
+        Container(
+          height: appBarAlpha > 0.2 ? 0.5 : 0,
+          decoration: BoxDecoration(
+            boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 0.5)],
+          ),
+        ),
+      ],
     );
   }
 
@@ -192,5 +210,11 @@ class _HomePageState extends State<HomePage> {
       });
     }
     return null;
+  }
+
+  _jumpToSearch() {
+  }
+
+  _jumpToSpeak() {
   }
 }
