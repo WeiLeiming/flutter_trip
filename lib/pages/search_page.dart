@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:trip/dao/search_dao.dart';
 import 'package:trip/model/search_model.dart';
+import 'package:trip/pages/speak_page.dart';
 import 'package:trip/widget/search_bar.dart';
 import 'package:trip/widget/webview.dart';
 
@@ -102,6 +103,7 @@ class _SearchPageState extends State<SearchPage> {
               hideLeft: widget.hideLeft,
               defaultText: widget.keyword,
               hint: widget.hint,
+              speakClick: _jumpToSpeak,
               leftButtonClick: () {
                 Navigator.pop(context);
               },
@@ -110,6 +112,15 @@ class _SearchPageState extends State<SearchPage> {
           ),
         ),
       ],
+    );
+  }
+
+  _jumpToSpeak() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => SpeakPage(),
+      ),
     );
   }
 
@@ -198,19 +209,17 @@ class _SearchPageState extends State<SearchPage> {
       text: TextSpan(
         children: <TextSpan>[
           TextSpan(
-            text: item.price ?? '',
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.orange,
-            )
-          ),
+              text: item.price ?? '',
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.orange,
+              )),
           TextSpan(
-              text: ' '+(item.star ?? ''),
+              text: ' ' + (item.star ?? ''),
               style: TextStyle(
                 fontSize: 12,
                 color: Colors.grey,
-              )
-          ),
+              )),
         ],
       ),
     );

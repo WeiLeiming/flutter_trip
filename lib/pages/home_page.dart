@@ -6,6 +6,7 @@ import 'package:trip/model/grid_nav_model.dart';
 import 'package:trip/model/home_model.dart';
 import 'package:trip/model/sales_box_model.dart';
 import 'package:trip/pages/search_page.dart';
+import 'package:trip/pages/speak_page.dart';
 import 'package:trip/utils/logger.dart';
 import 'package:trip/widget/grid_nav.dart';
 import 'package:trip/widget/loading_container.dart';
@@ -225,5 +226,12 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  _jumpToSpeak() {}
+  _jumpToSpeak() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => SpeakPage(),
+      ),
+    );
+  }
 }
